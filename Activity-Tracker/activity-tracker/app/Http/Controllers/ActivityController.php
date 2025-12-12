@@ -14,34 +14,40 @@ class ActivityController extends Controller
 
     public function store(Request $request)
     {
-        Activity::create([
-            'member_name' => $request->member_name,
-            'title' => $request->title,
-            'details' => $request->details,
-            'sms_count' => $request->sms_count,
-            'sms_account_from_logs' => $request->sms_account_from_logs,
-            'activity_date' => $request->activity_date,
+        $data = $request->validate([
+            'member_name' => ['required', 'string'],
+            'title' => ['required', 'string'],
+            'details' => ['nullable', 'string'],
+            'sms_count' => ['nullable', 'integer'],
+            'sms_account_from_logs' => ['nullable', 'integer'],
+            'activity_date' => ['required', 'date'],
         ]);
+
+        Activity::create($data);
 
         return 'Activity saved!';
     }
 
     public function edit(Activity $activity)
-{
-    return view('activities.edit', compact('activity'));
-}
+    {
+        return view('activities.edit', compact('activity'));
+    }
 
-public function update(Request $request, Activity $activity)
-{
-    $data = $request->validate([
-        'status' => ['required', 'in:pending,done'],
-        'remark' => ['nullable', 'string'],
-    ]);
+    public function update(Request $request, Activity $activity)
+    {
+        $data = $request->validate([
+            'status' => ['required', 'in:pending,done'],
+            'remark' => ['nullable', 'string'],
 
-    $activity->update($data);
+            'status_updated_by_name' => ['required', 'string'],
+            'status_updated_by_role' => ['required', 'string'],
+            'status_updated_by_email' => ['required', 'email'],
+        ]);
 
-    return 'Activity updated!';
-}
+        $data['status_updated_at'] = now();
 
+        $activity->update($data);
 
+        return 'Activity updated!';
+    }
 }

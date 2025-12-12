@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Activity extends Model
 {
     protected $fillable = [
+
         'member_name',
         'title',
         'details',
@@ -15,6 +16,10 @@ class Activity extends Model
         'activity_date',
         'status',
         'remark',
+        'status_updated_by_name',
+        'status_updated_by_role',
+        'status_updated_by_email',
+        'status_updated_at',
 
     ];
 }
