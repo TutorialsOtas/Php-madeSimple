@@ -13,4 +13,6 @@ Route::get('/activities/daily-updates', [ActivityController::class, 'dailyUpdate
 Route::post('/activities', [ActivityController::class, 'store']);
 Route::get('/activities/{activity}/edit', [ActivityController::class, 'edit']);
 Route::put('/activities/{activity}', [ActivityController::class, 'update']);
+Route::get('/activities/reports', [ActivityController::class, 'reports']);
+//Route::get('/activities/reports/generate', [ActivityController::class, 'generateReport']);
 

@@ -81,4 +81,25 @@ class ActivityController extends Controller
 
         return view('activities.daily_updates', compact('updates', 'date'));
     }
+
+    // Reporting view by custom duration (Requirement 5)
+    public function reports(Request $request)
+    {
+        $from = $request->query('from');
+        $to = $request->query('to');
+
+        $updatesQuery = ActivityUpdate::with('activity')
+            ->orderBy('updated_at', 'desc');
+
+        if ($from && $to) {
+            $updatesQuery->whereBetween('updated_at', [
+                $from . ' 00:00:00',
+                $to . ' 23:59:59',
+            ]);
+        }
+
+        $updates = $updatesQuery->get();
+
+        return view('activities.reports', compact('updates', 'from', 'to'));
+    }
 }
