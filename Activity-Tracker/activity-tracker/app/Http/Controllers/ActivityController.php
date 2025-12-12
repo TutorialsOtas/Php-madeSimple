@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Activity;
+use App\Models\ActivityUpdate;
 use Illuminate\Http\Request;
 
 class ActivityController extends Controller
@@ -44,10 +45,40 @@ class ActivityController extends Controller
             'status_updated_by_email' => ['required', 'email'],
         ]);
 
-        $data['status_updated_at'] = now();
+        $now = now();
 
+        // Log history (Requirement 4)
+        ActivityUpdate::create([
+            'activity_id' => $activity->id,
+
+            'updated_by_name' => $data['status_updated_by_name'],
+            'updated_by_role' => $data['status_updated_by_role'],
+            'updated_by_email' => $data['status_updated_by_email'],
+
+            'old_status' => $activity->status,
+            'new_status' => $data['status'],
+
+            'old_remark' => $activity->remark,
+            'new_remark' => $data['remark'] ?? null,
+        ]);
+
+        // Update current activity state (Requirements 2 & 3)
+        $data['status_updated_at'] = $now;
         $activity->update($data);
 
         return 'Activity updated!';
+    }
+
+    // Daily view of all updates (Requirement 4)
+    public function dailyUpdates(Request $request)
+    {
+        $date = $request->query('date', now()->toDateString());
+
+        $updates = ActivityUpdate::with('activity')
+            ->whereDate('updated_at', $date)
+            ->orderBy('updated_at', 'desc')
+            ->get();
+
+        return view('activities.daily_updates', compact('updates', 'date'));
     }
 }
