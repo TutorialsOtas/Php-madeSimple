@@ -13,6 +13,9 @@ class Activity extends Model
         'sms_count',
         'sms_account_from_logs',
         'activity_date',
+        'status',
+        'remark',
+
     ];
 }
 

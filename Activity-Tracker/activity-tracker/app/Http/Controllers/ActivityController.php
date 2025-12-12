@@ -25,4 +25,23 @@ class ActivityController extends Controller
 
         return 'Activity saved!';
     }
+
+    public function edit(Activity $activity)
+{
+    return view('activities.edit', compact('activity'));
+}
+
+public function update(Request $request, Activity $activity)
+{
+    $data = $request->validate([
+        'status' => ['required', 'in:pending,done'],
+        'remark' => ['nullable', 'string'],
+    ]);
+
+    $activity->update($data);
+
+    return 'Activity updated!';
+}
+
+
 }
