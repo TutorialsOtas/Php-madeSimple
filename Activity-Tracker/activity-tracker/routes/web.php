@@ -8,20 +8,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-/*
-|--------------------------------------------------------------------------
-| Dashboard (after login)
-|--------------------------------------------------------------------------
-*/
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-/*
-|--------------------------------------------------------------------------
-| Authenticated routes
-|--------------------------------------------------------------------------
-*/
 Route::middleware('auth')->group(function () {
 
     // Profile (Breeze default)
