@@ -280,7 +280,7 @@
 
             <form class="filter" method="GET" action="/activities/daily-updates">
               <input type="date" name="date" value="{{ $date }}">
-              <button class="btn" id="viewBtn" type="submit">View</button>
+              <button class="btn" id="viewBtn" type="submit">Updates</button>
             </form>
           </div>
 
