@@ -43,8 +43,11 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
 
-        Auth::login($user);
+// IMPORTANT: do NOT auto-login
+// Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+return redirect()->route('login')->with('prefill_email', $request->email);
+
+
     }
 }
