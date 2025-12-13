@@ -73,14 +73,24 @@ class ActivityController extends Controller
     // Daily view of all updates (Requirement 4)
     public function dailyUpdates(Request $request)
     {
-        $date = $request->query('date', now()->toDateString());
+    
 
-        $updates = ActivityUpdate::with('activity')
-            ->whereDate('updated_at', $date)
-            ->orderBy('updated_at', 'desc')
-            ->get();
+    $date = $request->query('date', now()->toDateString());
 
-        return view('activities.daily_updates', compact('updates', 'date'));
+    // Status/remark updates (already exists)
+    $updates = ActivityUpdate::with('activity')
+        ->whereDate('updated_at', $date)
+        ->orderBy('updated_at', 'desc')
+        ->get();
+
+    // NEW: activities created that day
+    $activities = Activity::whereDate('created_at', $date)
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+    return view('activities.daily_updates', compact('updates', 'activities', 'date'));
+
+
     }
 
     // Reporting view by custom duration (Requirement 5)
