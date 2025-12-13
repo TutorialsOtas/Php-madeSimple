@@ -226,8 +226,68 @@
       .ripple{ display:none; }
       .card::before{ transition:none; }
     }
+
+    .toast{
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 9999;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(2,6,23,.85);
+  color: #e5e7eb;
+  box-shadow: 0 20px 60px rgba(0,0,0,.55);
+
+  transform: translateX(120%);
+  opacity: 0;
+}
+
+.toast-show{
+  animation: toastIn .35s ease-out forwards;
+}
+
+@keyframes toastIn{
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.toast-icon{
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #facc15, #22c55e);
+  color: #0b1020;
+  font-weight: 900;
+}
+
+.toast-text strong{
+  display:block;
+  font-size: 13px;
+  line-height: 1.1;
+}
+.toast-text div{
+  font-size: 12.5px;
+  color: rgba(229,231,235,.75);
+}
+
   </style>
 </head>
+
+    @if(session('success'))
+  <div class="toast toast-show" id="toast">
+    <span class="toast-icon">✅</span>
+    <div class="toast-text">
+      <strong>Saved</strong>
+      <div>{{ session('success') }}</div>
+    </div>
+  </div>
+@endif
 
 <body>
   <div class="wrap">

@@ -26,7 +26,8 @@ class ActivityController extends Controller
 
         Activity::create($data);
 
-        return 'Activity saved!';
+        return redirect()->back()->with('success', 'Activity saved!');
+
     }
 
     public function edit(Activity $activity)
