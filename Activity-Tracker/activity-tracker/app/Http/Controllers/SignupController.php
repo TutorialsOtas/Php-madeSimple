@@ -21,13 +21,26 @@ class SignupController extends Controller
             'password' => ['required', 'min:8', 'confirmed'],
         ]);
 
-        User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']), // important!
-        ]);
+    //     User::create([
+    //         'name' => $data['name'],
+    //         'email' => $data['email'],
+    //         'password' => Hash::make($data['password']), // important!
+    //     ]);
 
-        // After signup, go to login (no auto-login, no autofill)
-        return redirect()->route('login')->with('status', 'Account created. Please log in.');
-    }
+    //     // After signup, go to login (no auto-login, no autofill)
+    //     return redirect()->route('login')->with('status', 'Account created. Please log in.');
+    // }
+
+    // Create the user and keep a reference to log them in
+    $user = User::create([
+        'name' => $data['name'],
+        'email' => $data['email'],
+        'password' => Hash::make($data['password']),
+    ]);
+
+    // Log the new user in
+    \Illuminate\Support\Facades\Auth::login($user);
+
+    return redirect()->route('dashboard');
+}
 }
