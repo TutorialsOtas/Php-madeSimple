@@ -8,16 +8,10 @@ COPY vite.config.js postcss.config.js tailwind.config.js ./
 COPY resources ./resources
 RUN npm run build
 
-FROM composer:2.7 AS composer_deps
-WORKDIR /app
-COPY composer.json composer.lock ./
-RUN composer install --no-dev --no-progress --no-interaction --prefer-dist --optimize-autoloader --no-scripts
-
-FROM php:8.2-cli-bullseye AS runtime
-ENV PORT=8000
+FROM php:8.2-cli-bullseye AS php_base
 ENV APP_ENV=production
 ENV APP_DEBUG=false
-WORKDIR /var/www/html
+ENV PORT=8000
 
 RUN apt-get update && apt-get install -y \
         git \
@@ -33,6 +27,14 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer:2.7 /usr/bin/composer /usr/local/bin/composer
+
+FROM php_base AS composer_deps
+WORKDIR /app
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --no-progress --no-interaction --prefer-dist --optimize-autoloader --no-scripts
+
+FROM php_base AS runtime
+WORKDIR /var/www/html
 
 COPY . .
 COPY --from=composer_deps /app/vendor ./vendor
