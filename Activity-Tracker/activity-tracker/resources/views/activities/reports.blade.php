@@ -141,6 +141,9 @@
       font-weight:800;
       cursor:pointer;
       text-align:center;
+      text-decoration: none; 
+      display: block;
+
     }
 
     @media (max-width: 900px){
@@ -201,9 +204,10 @@
 
     <!-- ACTIONS -->
     <div class="card actions">
-      <div class="action-btn">📄 Download PDF</div>
-      <div class="action-btn">📊 Download Excel</div>
-      <div class="action-btn" onclick="window.print()">🖨️ Print</div>
+     <a class="action-btn" href="/activities/reports/pdf?from={{ $from }}&to={{ $to }}">📄 Download PDF</a>
+<a class="action-btn" href="/activities/reports/excel?from={{ $from }}&to={{ $to }}">📊 Download Excel</a>
+<div class="action-btn" onclick="window.print()">🖨️ Print</div>
+
     </div>
 
   </div>

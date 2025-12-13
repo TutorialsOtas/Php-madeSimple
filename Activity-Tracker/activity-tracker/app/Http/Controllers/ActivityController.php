@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Activity;
 use App\Models\ActivityUpdate;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ActivitiesReportExport;
 
 class ActivityController extends Controller
 {
@@ -94,23 +97,90 @@ class ActivityController extends Controller
     }
 
     // Reporting view by custom duration (Requirement 5)
-    public function reports(Request $request)
-    {
-        $from = $request->query('from');
-        $to = $request->query('to');
+   public function reports(Request $request)
+{
+    $from = $request->query('from');
+    $to   = $request->query('to');
 
-        $updatesQuery = ActivityUpdate::with('activity')
-            ->orderBy('updated_at', 'desc');
+    $updates = collect();
+    $activities = collect();
 
-        if ($from && $to) {
-            $updatesQuery->whereBetween('updated_at', [
-                $from . ' 00:00:00',
-                $to . ' 23:59:59',
-            ]);
-        }
+    $summary = [
+        'activities_created' => 0,
+        'updates_made'       => 0,
+        'pending_as_of_to'   => 0,
+        'done_as_of_to'      => 0,
+    ];
 
-        $updates = $updatesQuery->get();
+    if ($from && $to) {
+        $fromDT = $from . ' 00:00:00';
+        $toDT   = $to . ' 23:59:59';
 
-        return view('activities.reports', compact('updates', 'from', 'to'));
+        $updates = ActivityUpdate::with('activity')
+            ->whereBetween('updated_at', [$fromDT, $toDT])
+            ->orderBy('updated_at', 'desc')
+            ->get();
+
+        $activities = Activity::whereBetween('created_at', [$fromDT, $toDT])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $summary['activities_created'] = $activities->count();
+        $summary['updates_made'] = $updates->count();
+
+        // accumulated (as of end date)
+        $summary['pending_as_of_to'] = Activity::where('created_at', '<=', $toDT)
+            ->where('status', 'pending')
+            ->count();
+
+        $summary['done_as_of_to'] = Activity::where('created_at', '<=', $toDT)
+            ->where('status', 'done')
+            ->count();
     }
+
+    return view('activities.reports', compact('updates', 'activities', 'from', 'to', 'summary'));
+}
+
+public function reportsPdf(Request $request)
+{
+    $from = $request->query('from');
+    $to   = $request->query('to');
+
+    abort_unless($from && $to, 400, 'Please select from/to dates.');
+
+    $fromDT = $from . ' 00:00:00';
+    $toDT   = $to . ' 23:59:59';
+
+    $updates = ActivityUpdate::with('activity')
+        ->whereBetween('updated_at', [$fromDT, $toDT])
+        ->orderBy('updated_at', 'desc')
+        ->get();
+
+    $activities = Activity::whereBetween('created_at', [$fromDT, $toDT])
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+    $summary = [
+        'activities_created' => $activities->count(),
+        'updates_made'       => $updates->count(),
+        'pending_as_of_to'   => Activity::where('created_at', '<=', $toDT)->where('status', 'pending')->count(),
+        'done_as_of_to'      => Activity::where('created_at', '<=', $toDT)->where('status', 'done')->count(),
+    ];
+
+    $pdf = Pdf::loadView('activities.reports_pdf', compact('from', 'to', 'updates', 'activities', 'summary'))
+        ->setPaper('a4', 'portrait');
+
+    return $pdf->download("activity-report-{$from}-to-{$to}.pdf");
+}
+
+public function reportsExcel(Request $request)
+{
+    $from = $request->query('from');
+    $to   = $request->query('to');
+
+    abort_unless($from && $to, 400, 'Please select from/to dates.');
+
+    return Excel::download(new ActivitiesReportExport($from, $to), "activity-report-{$from}-to-{$to}.xlsx");
+}
+
 }

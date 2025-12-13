@@ -32,6 +32,10 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/activities/daily-updates', [ActivityController::class, 'dailyUpdates']);
     Route::get('/activities/reports', [ActivityController::class, 'reports']);
+
+    Route::get('/activities/reports/pdf', [ActivityController::class, 'reportsPdf']);
+    Route::get('/activities/reports/excel', [ActivityController::class, 'reportsExcel']);
+
 });
 
 // Keep Breeze auth routes (mainly for logout)
