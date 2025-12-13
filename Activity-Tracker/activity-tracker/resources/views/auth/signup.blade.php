@@ -265,7 +265,7 @@
         <button class="btn" type="submit">Create Account</button>
       </form>
         <p class="foot">
-            Crafted with ❤️ &nbsp;|&nbsp;By the Snake.
+            Crafted with ❤️ &nbsp;|&nbsp;By Snake.
     </main>
   </div>
 </body>
